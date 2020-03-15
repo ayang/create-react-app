@@ -59,6 +59,10 @@ const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
+const lessRegex = /\.less$/;
+const lessModuleRegex = /\.module\.less$/;
+
+const localIdentName = '[name]__[local]__[hash:base64:5]'
 
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
@@ -76,9 +80,15 @@ module.exports = function(webpackEnv) {
   // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
   // Get environment variables to inject into our app.
   const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1));
+  const lessLoaderOptions = {
+    strictMath: false,
+    noIeCompat: true,
+    javascriptEnabled: true,
+  }
 
   // common function to get style loaders
-  const getStyleLoaders = (cssOptions, preProcessor) => {
+  const getStyleLoaders = (cssOptions, preProcessor, preProcessorOptions) => {
+    preProcessorOptions = preProcessorOptions || {}
     const loaders = [
       isEnvDevelopment && require.resolve('style-loader'),
       isEnvProduction && {
@@ -115,7 +125,7 @@ module.exports = function(webpackEnv) {
             // which in turn let's users customize the target behavior as per their needs.
             postcssNormalize(),
           ],
-          sourceMap: isEnvProduction && shouldUseSourceMap,
+          sourceMap: shouldUseSourceMap,
         },
       },
     ].filter(Boolean);
@@ -124,13 +134,14 @@ module.exports = function(webpackEnv) {
         {
           loader: require.resolve('resolve-url-loader'),
           options: {
-            sourceMap: isEnvProduction && shouldUseSourceMap,
+            sourceMap: shouldUseSourceMap,
           },
         },
         {
           loader: require.resolve(preProcessor),
           options: {
             sourceMap: true,
+            ...preProcessorOptions
           },
         }
       );
@@ -409,6 +420,7 @@ module.exports = function(webpackEnv) {
                 ),
                 // @remove-on-eject-end
                 plugins: [
+                  ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": true }],
                   [
                     require.resolve('babel-plugin-named-asset-import'),
                     {
@@ -481,7 +493,7 @@ module.exports = function(webpackEnv) {
               exclude: cssModuleRegex,
               use: getStyleLoaders({
                 importLoaders: 1,
-                sourceMap: isEnvProduction && shouldUseSourceMap,
+                sourceMap: shouldUseSourceMap,
               }),
               // Don't consider CSS imports dead code even if the
               // containing package claims to have no side effects.
@@ -495,8 +507,9 @@ module.exports = function(webpackEnv) {
               test: cssModuleRegex,
               use: getStyleLoaders({
                 importLoaders: 1,
-                sourceMap: isEnvProduction && shouldUseSourceMap,
+                sourceMap: shouldUseSourceMap,
                 modules: {
+                  // localIdentName: localIdentName,
                   getLocalIdent: getCSSModuleLocalIdent,
                 },
               }),
@@ -510,7 +523,7 @@ module.exports = function(webpackEnv) {
               use: getStyleLoaders(
                 {
                   importLoaders: 3,
-                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                  sourceMap: shouldUseSourceMap,
                 },
                 'sass-loader'
               ),
@@ -527,12 +540,43 @@ module.exports = function(webpackEnv) {
               use: getStyleLoaders(
                 {
                   importLoaders: 3,
-                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                  sourceMap: shouldUseSourceMap,
                   modules: {
+                    // localIdentName: localIdentName,
                     getLocalIdent: getCSSModuleLocalIdent,
                   },
                 },
                 'sass-loader'
+              ),
+            },
+            // less
+            {
+              test: lessRegex,
+              exclude: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 2,
+                  sourceMap: shouldUseSourceMap,
+                },
+                'less-loader',
+                lessLoaderOptions
+              ),
+              sideEffects: true,
+            },
+            // less module
+            {
+              test: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 2,
+                  sourceMap: shouldUseSourceMap,
+                  modules: {
+                    // localIdentName: localIdentName,
+                    getLocalIdent: getCSSModuleLocalIdent,
+                  },
+                },
+                'less-loader',
+                lessLoaderOptions,
               ),
             },
             // "file" loader makes sure those assets get served by WebpackDevServer.
