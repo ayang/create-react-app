@@ -399,7 +399,7 @@ module.exports = function(webpackEnv) {
                   'babel-preset-react-app/webpack-overrides'
                 ),
                 // @remove-on-eject-begin
-                babelrc: false,
+                babelrc: true,
                 configFile: false,
                 presets: [require.resolve('babel-preset-react-app')],
                 // Make sure we have a unique cache identifier, erring on the
@@ -420,7 +420,6 @@ module.exports = function(webpackEnv) {
                 ),
                 // @remove-on-eject-end
                 plugins: [
-                  ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": true }],
                   [
                     require.resolve('babel-plugin-named-asset-import'),
                     {
