@@ -1,7 +1,7 @@
 {
   "name": "react-scripts-antd-custom-abc",
-  "version": "3.4.0",
-  "description": "Configuration and scripts for Create React App.",
+  "version": "3.4.1",
+  "description": "Configuration and scripts for Create React App. This is a customized version only used by me, please DON'T USE.",
   "repository": {
     "type": "git",
     "url": "https://github.com/facebook/create-react-app.git",
