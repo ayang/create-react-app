@@ -70,6 +70,15 @@ const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
+const lessRegex = /\.less$/;
+const lessModuleRegex = /\.module\.less$/;
+
+const localIdentName = '[name]__[local]__[hash:base64:5]'
+const lessLoaderOptions = {
+  strictMath: false,
+  noIeCompat: true,
+  javascriptEnabled: true,
+}
 
 const hasJsxRuntime = (() => {
   if (process.env.DISABLE_NEW_JSX_TRANSFORM === 'true') {
@@ -158,6 +167,7 @@ module.exports = function (webpackEnv) {
           loader: require.resolve(preProcessor),
           options: {
             sourceMap: true,
+            javascriptEnabled: true,
           },
         }
       );
@@ -570,6 +580,37 @@ module.exports = function (webpackEnv) {
                   },
                 },
                 'sass-loader'
+              ),
+            },
+            // less
+            {
+              test: lessRegex,
+              exclude: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 1,
+                  sourceMap: isEnvProduction
+                  ? shouldUseSourceMap
+                  : isEnvDevelopment,
+                },
+                'less-loader'
+              ),
+              sideEffects: true,
+            },
+            // less module
+            {
+              test: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 1,
+                  sourceMap: isEnvProduction
+                  ? shouldUseSourceMap
+                  : isEnvDevelopment,
+                  modules: {
+                    getLocalIdent: getCSSModuleLocalIdent,
+                  },
+                },
+                'less-loader'
               ),
             },
             // "file" loader makes sure those assets get served by WebpackDevServer.

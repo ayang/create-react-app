@@ -1,5 +1,5 @@
 {
-  "name": "react-scripts",
+  "name": "react-scripts-antd-custom-abc",
   "version": "4.0.1",
   "description": "Configuration and scripts for Create React App.",
   "repository": {
@@ -62,6 +62,9 @@
     "jest-circus": "26.6.0",
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
+    "less": "3.9.0",
+    "less-loader": "^5.0.0",
+    "less-vars-to-js": "^1.2.1",
     "mini-css-extract-plugin": "0.11.3",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "pnp-webpack-plugin": "1.6.4",
